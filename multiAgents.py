@@ -179,7 +179,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         alpha = float('-inf')
         beta = float('inf')
-        bestAction = None
+        bestAction = Directions.STOP
         bestValue = float('-inf')
 
         for action in gameState.getLegalActions(0):
@@ -234,7 +234,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        bestAction = None
+        bestAction = Directions.STOP
         bestValue = float('-inf')
 
         legalActions = gameState.getLegalActions(0)
