@@ -58,24 +58,46 @@ class ReflexAgent(Agent):
 
         The evaluation function takes in the current and proposed successor
         GameStates (pacman.py) and returns a number, where higher numbers are better.
-
-        The code below extracts some useful information from the state, like the
-        remaining food (newFood) and Pacman position after moving (newPos).
-        newScaredTimes holds the number of moves that each ghost will remain
-        scared because of Pacman having eaten a power pellet.
-
-        Print out these variables to see what you're getting, then combine them
-        to create a masterful evaluation function.
         """
-        # Useful information you can extract from a GameState (pacman.py)
+        # Trích xuất thông tin hữu ích từ trạng thái tương lai (successor state)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # Khởi tạo điểm số cơ bản
+        score = successorGameState.getScore()
+
+        # 1. Thức ăn: Lực hút cơ bản (Sử dụng nghịch đảo khoảng cách)
+        foodList = newFood.asList()
+        if len(foodList) > 0:
+            foodDistances = [util.manhattanDistance(newPos, food) for food in foodList]
+            minFoodDist = min(foodDistances)
+            score += 1.0 / minFoodDist
+
+        # 2. Ma: Nâng cấp "Giác quan từ xa" và rượt đuổi ma sợ
+        for ghostState in newGhostStates:
+            ghostPos = ghostState.getPosition()
+            distToGhost = util.manhattanDistance(newPos, ghostPos)
+
+            if ghostState.scaredTimer == 0:
+                # Ma nguy hiểm
+                if distToGhost <= 1:
+                    return -999999 # Báo động đỏ: Tránh xa tuyệt đối
+                else:
+                    # Lực đẩy: Ma càng gần, điểm đánh giá càng bị trừ. Pacman sẽ biết né từ xa.
+                    score -= 1.0 / distToGhost
+            else:
+                # Ma hoảng sợ: Lực hút rượt đuổi
+                if distToGhost > 0:
+                    score += 2.0 / distToGhost
+
+        # 3. Chống lười biếng: Phạt nặng nếu chọn đứng im
+        from game import Directions
+        if action == Directions.STOP:
+            score -= 50
+
+        return score
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
