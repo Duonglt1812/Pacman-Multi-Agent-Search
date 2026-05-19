@@ -153,9 +153,13 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         nextAgentIndex = (agentIndex + 1) % numAgents
         nextDepth = depth + 1 if nextAgentIndex == 0 else depth
 
+        legalActions = state.getLegalActions(agentIndex)
+        if len(legalActions) == 0:
+            return self.evaluationFunction(state)
+
         if agentIndex == 0:
             value = float('-inf')
-            for action in state.getLegalActions(agentIndex):
+            for action in legalActions:
                 successor = state.generateSuccessor(agentIndex, action)
                 value = max(value, self.alphaBeta(successor, nextDepth, nextAgentIndex, alpha, beta))
                 alpha = max(alpha, value)
@@ -165,7 +169,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         else:
             value = float('inf')
-            for action in state.getLegalActions(agentIndex):
+            for action in legalActions:
                 successor = state.generateSuccessor(agentIndex, action)
                 value = min(value, self.alphaBeta(successor, nextDepth, nextAgentIndex, alpha, beta))
                 beta = min(beta, value)
