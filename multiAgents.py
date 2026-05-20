@@ -58,24 +58,46 @@ class ReflexAgent(Agent):
 
         The evaluation function takes in the current and proposed successor
         GameStates (pacman.py) and returns a number, where higher numbers are better.
-
-        The code below extracts some useful information from the state, like the
-        remaining food (newFood) and Pacman position after moving (newPos).
-        newScaredTimes holds the number of moves that each ghost will remain
-        scared because of Pacman having eaten a power pellet.
-
-        Print out these variables to see what you're getting, then combine them
-        to create a masterful evaluation function.
         """
-        # Useful information you can extract from a GameState (pacman.py)
+        # Trích xuất thông tin hữu ích từ trạng thái tương lai (successor state)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # Khởi tạo điểm số cơ bản
+        score = successorGameState.getScore()
+
+        # 1. Thức ăn: Lực hút cơ bản (Sử dụng nghịch đảo khoảng cách)
+        foodList = newFood.asList()
+        if len(foodList) > 0:
+            foodDistances = [util.manhattanDistance(newPos, food) for food in foodList]
+            minFoodDist = min(foodDistances)
+            score += 1.0 / minFoodDist
+
+        # 2. Ma: Nâng cấp "Giác quan từ xa" và rượt đuổi ma sợ
+        for ghostState in newGhostStates:
+            ghostPos = ghostState.getPosition()
+            distToGhost = util.manhattanDistance(newPos, ghostPos)
+
+            if ghostState.scaredTimer == 0:
+                # Ma nguy hiểm
+                if distToGhost <= 1:
+                    return -999999 # Báo động đỏ: Tránh xa tuyệt đối
+                else:
+                    # Lực đẩy: Ma càng gần, điểm đánh giá càng bị trừ. Pacman sẽ biết né từ xa.
+                    score -= 1.0 / distToGhost
+            else:
+                # Ma hoảng sợ: Lực hút rượt đuổi
+                if distToGhost > 0:
+                    score += 2.0 / distToGhost
+
+        # 3. Chống lười biếng: Phạt nặng nếu chọn đứng im
+        from game import Directions
+        if action == Directions.STOP:
+            score -= 50
+
+        return score
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
@@ -206,13 +228,68 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
-    Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-    evaluation function (question 5).
-
-    DESCRIPTION: <write something here so we know what you did>
+    Extreme evaluation function for Q5
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # điểm số thắng/thua:
+    # nếu thắng thì trả về vô cùng dương
+
+    if currentGameState.isWin():
+        return float('inf')
+
+    # nếu thua thì trả về vô cùng âm
+    if currentGameState.isLose():
+        return float('-inf')
+    
+    # lấy thông tin từ trạng thái hiện tại
+
+    pos = currentGameState.getPacmanPosition() # vị trí của pacman
+    food = currentGameState.getFood().asList() # danh sách vị trí thức ăn còn lại
+    ghosts = currentGameState.getGhostStates() # danh sách trạng thái ghost
+    capsules = currentGameState.getCapsules() # danh sách vị trí điểm đặc biệt còn lại
+
+    score = currentGameState.getScore() # điểm số hiện tại
+
+    # FOOD
+    if food:
+         # tính khoảng cách Manhattan từ pacman đến từng thức ăn còn lại
+        foodDistances = [manhattanDistance(pos, f) for f in food] 
+
+        nearestFood = min(foodDistances) # lấy ra khoảng cách nhỏ nhất
+
+        # khuyến khích pacman di chuyển về phía thức ăn gần nhất, 
+        # cộng thêm 15 điểm chia cho khoảng cách đến thức ăn đó (cộng 1 để tránh chia cho 0)
+        score += 15.0 / (nearestFood + 1)
+
+        # khuyến khích dọn dẹp bảng thức ăn, trừ đi 4 điểm cho mỗi thức ăn còn lại
+        score -= 4 * len(food)
+
+
+    # CAPSULES
+    # trừ đi 20 điểm cho mỗi điểm đặc biệt còn lại để khuyến khích pacman ăn chúng
+    score -= 20 * len(capsules)
+
+
+    # GHOSTS
+    for ghost in ghosts:
+        ghostPos = ghost.getPosition() # lấy vị trí của ghost
+        dist = manhattanDistance(pos, ghostPos) # tính khoảng cách Manhattan từ pacman đến ghost
+
+        if ghost.scaredTimer > 0:
+            # nếu đang trong thời gian ăn viên đặc biệt, 
+            # khuyến khích pacman di chuyển tới ghost để ăn chúng, 
+            # cộng thêm 25 điểm chia cho khoảng cách đến ghost đó (cộng 1 để tránh chia cho 0)
+            score += 25.0 / (dist + 1)
+
+        else:
+            # khuyến khích pacman tránh xa ghost, trừ đi 1000 điểm nếu ghost quá gần (khoảng cách <= 1),
+            if dist <= 1:
+                score -= 1000
+            
+            # nếu ghost ở xa, trừ đi 4 điểm chia cho khoảng cách đến ghost đó để khuyến khích pacman tránh xa chúng
+            else:
+                score -= 4.0 / dist
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
