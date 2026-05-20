@@ -199,7 +199,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
     """
-
     def expectimax(self, state: GameState, depth: int, agentIndex: int):
         if state.isWin() or state.isLose() or depth == self.depth:
             return self.evaluationFunction(state)
