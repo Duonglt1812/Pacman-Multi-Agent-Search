@@ -136,7 +136,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         numAgents = gameState.getNumAgents()
-
+        
+        
         def minimax(state, agentIndex, depth):
             if state.isWin() or state.isLose() or depth == self.depth:
                 return self.evaluationFunction(state)
@@ -148,7 +149,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             nextAgent = agentIndex + 1
             nextDepth = depth
 
-            if nextAgent == numAgents:
+            if nextAgent == numAgents :
                 nextAgent = 0
                 nextDepth = depth + 1
 
