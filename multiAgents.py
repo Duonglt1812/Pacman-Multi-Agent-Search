@@ -203,13 +203,13 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
     """
-
-    def getAction(self, gameState: GameState):
-        """
-        Returns the minimax action using self.depth and self.evaluationFunction
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    def expectimax(self, state: GameState, depth: int, agentIndex: int):
+        if state.isWin() or state.isLose() or depth == self.depth:
+            return self.evaluationFunction(state)
+        
+        numAgents = state.getNumAgents()
+        nextAgentIndex = (agentIndex + 1) % numAgents
+        nextDepth = depth + 1 if nextAgentIndex == 0 else depth
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
