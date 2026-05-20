@@ -114,25 +114,25 @@ for ghost in ghosts:
 #### 3.1 Kết quả Autograder
 
 ```
-=== Test Case: test_cases/q5/grade-agent.test ===
-✓ PASSED
+Test Case: test_cases/q5/grade-agent.test
+PASSED
 
-Chi Tiết Chấm Điểm (trên 10 ván smallClassic):
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[1] Không Timeout:           1/1 ✓
-    → Chạy không timeout
+Chi Tiết Chấm Điểm:
 
-[2] Tỉ Lệ Thắng:             3/3 ✓
-    → Thắng 10/10 lần (yêu cầu: ≥5 lần)
+1.Không Timeout:           1/1
+    -> Chạy không timeout
 
-[3] Điểm Trung Bình:         2/2 ✓
-    → 1167.2 điểm (yêu cầu: ≥1000)
+2.Tỉ Lệ Thắng:             3/3
+    -> Thắng 10/10 lần (yêu cầu: ≥5 lần)
 
-[4] Tốc Độ Thực Thi:         1/1 ✓
-    → <30 giây/ván
+3.Điểm Trung Bình:         2/2
+    -> 1167.2 điểm (yêu cầu: ≥1000)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TỔNG ĐIỂM:                  6/6 ✓✓✓
+4.Tốc Độ Thực Thi:         1/1
+    -> <30 giây/ván
+
+
+TỔNG ĐIỂM:                  6/6 
 ```
 
 #### 3.2 Phân tích kết quả
